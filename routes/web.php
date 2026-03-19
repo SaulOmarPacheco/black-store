@@ -40,6 +40,6 @@ Route::get('/empleado/dashboard', function () {
 
 Route::get('/cliente/dashboard', function () {
     return "Dashboard Cliente";
-})->middleware(['auth', 'role:cliente']);
+})->middleware(['auth', 'role:cliente']);   
 
 require __DIR__.'/auth.php';
