@@ -3,63 +3,85 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Http\Request;
 
 class ProductVariantController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $variants = ProductVariant::with('product')->latest()->get();
+        return view('admin.variants.index', compact('variants'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $products = Product::where('active', true)->orderBy('name')->get();
+        return view('admin.variants.create', compact('products'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'sku' => 'required|string|max:255|unique:product_variants,sku',
+            'size' => 'required|string|max:50',
+            'color' => 'required|string|max:50',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'min_stock' => 'required|integer|min:0',
+            'max_stock' => 'required|integer|gte:min_stock',
+            'active' => 'nullable|boolean',
+        ]);
+
+        $validated['active'] = $request->has('active');
+
+        ProductVariant::create($validated);
+
+        return redirect()->route('variants.index')
+            ->with('success', 'Variante creada correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(ProductVariant $variant)
     {
-        //
+        $variant->load('product');
+        return view('admin.variants.show', compact('variant'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(ProductVariant $variant)
     {
-        //
+        $products = Product::where('active', true)->orderBy('name')->get();
+        return view('admin.variants.edit', compact('variant', 'products'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, ProductVariant $variant)
     {
-        //
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'sku' => 'required|string|max:255|unique:product_variants,sku,' . $variant->id,
+            'size' => 'required|string|max:50',
+            'color' => 'required|string|max:50',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'min_stock' => 'required|integer|min:0',
+            'max_stock' => 'required|integer|gte:min_stock',
+            'active' => 'nullable|boolean',
+        ]);
+
+        $validated['active'] = $request->has('active');
+
+        $variant->update($validated);
+
+        return redirect()->route('variants.index')
+            ->with('success', 'Variante actualizada correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(ProductVariant $variant)
     {
-        //
+        $variant->delete();
+
+        return redirect()->route('variants.index')
+            ->with('success', 'Variante eliminada correctamente.');
     }
 }
