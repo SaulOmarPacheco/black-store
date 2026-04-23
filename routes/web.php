@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductVariantController;
+use App\Http\Controllers\Client\CatalogController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -20,49 +21,51 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/admin/dashboard', function () {
-    return "Dashboard Admin";
-})->middleware(['auth']);
-
-Route::get('/empleado/dashboard', function () {
-    return "Dashboard Empleado";
-})->middleware(['auth']);
-
-Route::get('/cliente/dashboard', function () {
-    return "Dashboard Cliente";
-})->middleware(['auth']);
-
-
-Route::get('/admin/dashboard', function () {
-    return "Dashboard Admin";
-})->middleware(['auth', 'role:admin']);
-
-Route::get('/empleado/dashboard', function () {
-    return "Dashboard Empleado";
-})->middleware(['auth', 'role:empleado']);
-
-Route::get('/cliente/dashboard', function () {
-    return "Dashboard Cliente";
-})->middleware(['auth', 'role:cliente']);   
-
+/*
+|--------------------------------------------------------------------------
+| Rutas de administrador
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
-        return "Dashboard Admin";
-    });
+        return view('admin.dashboard');
+    })->name('admin.dashboard');
 
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
     Route::resource('variants', ProductVariantController::class);
 });
 
-Route::get('/empleado/dashboard', function () {
-    return "Dashboard Empleado";
-})->middleware(['auth', 'role:empleado']);
+/*
+|--------------------------------------------------------------------------
+| Rutas de empleado
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:empleado'])->prefix('empleado')->group(function () {
+    Route::get('/dashboard', function () {
+        return "Dashboard Empleado";
+    })->name('empleado.dashboard');
+});
 
-Route::get('/cliente/dashboard', function () {
-    return "Dashboard Cliente";
-})->middleware(['auth', 'role:cliente']);
+/*
+|--------------------------------------------------------------------------
+| Rutas de cliente
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:cliente'])->prefix('cliente')->group(function () {
+    Route::get('/dashboard', function () {
+        return "Dashboard Cliente";
+    })->name('cliente.dashboard');
 
+    Route::get('/catalogo', [CatalogController::class, 'index'])->name('cliente.catalogo');
 
+    Route::get('/carrito', function () {
+        return view('cliente.carrito');
+    })->name('cliente.carrito');
+
+    Route::get('/ticket', function () {
+        return view('cliente.ticket');
+    })->name('cliente.ticket');
+});
 
 require __DIR__.'/auth.php';

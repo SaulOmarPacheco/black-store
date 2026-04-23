@@ -1,3 +1,7 @@
+@extends('layouts.admin')
+
+@section('content')
+
 <h1>Categorías</h1>
 
 @if(session('success'))
@@ -5,6 +9,12 @@
 @endif
 
 <a href="{{ route('categories.create') }}">Nueva categoría</a>
+
+<form method="GET" action="{{ route('categories.index') }}" style="margin-bottom: 15px;">
+    <input type="text" name="search" placeholder="Buscar categoría por nombre" value="{{ $search ?? '' }}">
+    <button type="submit" class="btn">Buscar</button>
+    <a href="{{ route('categories.index') }}" class="btn" style="text-decoration:none;">Limpiar</a>
+</form>
 
 <table border="1" cellpadding="10">
     <thead>
@@ -39,3 +49,5 @@
         @endforelse
     </tbody>
 </table>
+
+@endsection

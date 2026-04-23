@@ -9,11 +9,27 @@ use Illuminate\Http\Request;
 
 class ProductVariantController extends Controller
 {
-    public function index()
-    {
-        $variants = ProductVariant::with('product')->latest()->get();
-        return view('admin.variants.index', compact('variants'));
-    }
+    public function index(Request $request)
+{
+    $search = $request->search;
+    $productId = $request->product_id;
+
+    $products = Product::orderBy('name')->get();
+
+    $variants = ProductVariant::with('product')
+        ->when($search, function ($query, $search) {
+            $query->where('sku', 'like', '%' . $search . '%')
+                  ->orWhere('size', 'like', '%' . $search . '%')
+                  ->orWhere('color', 'like', '%' . $search . '%');
+        })
+        ->when($productId, function ($query, $productId) {
+            $query->where('product_id', $productId);
+        })
+        ->latest()
+        ->get();
+
+    return view('admin.variants.index', compact('variants', 'products', 'search', 'productId'));
+}
 
     public function create()
     {

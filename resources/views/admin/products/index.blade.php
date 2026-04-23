@@ -1,3 +1,7 @@
+@extends('layouts.admin')
+
+@section('content')
+
 <h1>Productos</h1>
 
 @if(session('success'))
@@ -5,6 +9,22 @@
 @endif
 
 <a href="{{ route('products.create') }}">Nuevo producto</a>
+
+<form method="GET" action="{{ route('products.index') }}" style="margin-bottom: 15px;">
+    <input type="text" name="search" placeholder="Buscar producto por nombre" value="{{ $search ?? '' }}">
+
+    <select name="category_id">
+        <option value="">Todas las categorías</option>
+        @foreach($categories as $category)
+            <option value="{{ $category->id }}" {{ ($categoryId ?? '') == $category->id ? 'selected' : '' }}>
+                {{ $category->name }}
+            </option>
+        @endforeach
+    </select>
+
+    <button type="submit" class="btn">Buscar</button>
+    <a href="{{ route('products.index') }}" class="btn" style="text-decoration:none;">Limpiar</a>
+</form>     
 
 <table border="1" cellpadding="10">
     <thead>
@@ -51,3 +71,5 @@
         @endforelse
     </tbody>
 </table>
+
+@endsection

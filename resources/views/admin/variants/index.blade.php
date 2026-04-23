@@ -1,5 +1,23 @@
-<h1>Variantes de producto</h1>
+@extends('layouts.admin')
 
+@section('content')
+
+<h1>Variantes de producto</h1>
+<form method="GET" action="{{ route('variants.index') }}" style="margin-bottom: 15px;">
+    <input type="text" name="search" placeholder="Buscar por SKU, talla o color" value="{{ $search ?? '' }}">
+
+    <select name="product_id">
+        <option value="">Todos los productos</option>
+        @foreach($products as $product)
+            <option value="{{ $product->id }}" {{ ($productId ?? '') == $product->id ? 'selected' : '' }}>
+                {{ $product->name }}
+            </option>
+        @endforeach
+    </select>
+
+    <button type="submit" class="btn">Buscar</button>
+    <a href="{{ route('variants.index') }}" class="btn" style="text-decoration:none;">Limpiar</a>
+</form>
 @if(session('success'))
     <p>{{ session('success') }}</p>
 @endif
@@ -47,3 +65,5 @@
         @endforelse
     </tbody>
 </table>
+
+@endsection
